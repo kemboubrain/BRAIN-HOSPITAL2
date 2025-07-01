@@ -23,9 +23,20 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-700 to-secondary-600 dark:from-primary-900 dark:to-secondary-800 flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4">
+      {/* Background image with overlay */}
+      <div 
+        className="absolute inset-0 z-[-1]" 
+        style={{
+          backgroundImage: "url('https://images.pexels.com/photos/3376790/pexels-photo-3376790.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'brightness(0.5)'
+        }}
+      ></div>
+      
       <div className="max-w-md w-full space-y-8">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl p-8">
           {/* Logo et titre */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center space-x-2 mb-4">

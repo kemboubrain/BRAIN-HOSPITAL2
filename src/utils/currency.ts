@@ -2,7 +2,7 @@
 
 export const formatCurrency = (amount: number, currency: string = 'XOF'): string => {
   if (currency === 'XOF') {
-    return new Intl.NumberFormat('fr-SN', {
+    return new Intl.NumberFormat('fr-CI', {
       style: 'currency',
       currency: 'XOF',
       minimumFractionDigits: 0,
@@ -10,7 +10,7 @@ export const formatCurrency = (amount: number, currency: string = 'XOF'): string
     }).format(amount);
   }
   
-  return new Intl.NumberFormat('fr-FR', {
+  return new Intl.NumberFormat('fr-CI', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2
@@ -18,7 +18,7 @@ export const formatCurrency = (amount: number, currency: string = 'XOF'): string
 };
 
 export const formatNumber = (amount: number): string => {
-  return new Intl.NumberFormat('fr-SN').format(amount);
+  return new Intl.NumberFormat('fr-CI').format(amount);
 };
 
 // Conversion EUR vers XOF (taux approximatif: 1 EUR = 655.957 XOF)

@@ -40,39 +40,58 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-primary-700 via-secondary-600 to-secondary-500 dark:from-primary-900 dark:via-secondary-800 dark:to-secondary-700 rounded-xl shadow-lg p-8 text-white">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-6 md:mb-0">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="bg-white/20 p-3 rounded-full">
-                <Activity className="h-8 w-8" />
+      <div className="relative rounded-xl shadow-lg overflow-hidden">
+        {/* Background image with overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-900/90 to-secondary-900/80">
+          {/* This div serves as a dark overlay on top of the background image */}
+        </div>
+        
+        {/* Background image */}
+        <div 
+          className="absolute inset-0 z-[-1]" 
+          style={{
+            backgroundImage: "url('https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'brightness(0.5)'
+          }}
+        ></div>
+        
+        {/* Content */}
+        <div className="relative z-10 p-8 text-white">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-6 md:mb-0">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="bg-white/20 p-3 rounded-full">
+                  <Activity className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold">BRAIN HOSPITAL</h1>
+                  <p className="text-blue-100">Centre Médical d'Excellence</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold">BRAIN HOSPITAL</h1>
-                <p className="text-blue-100">Centre Médical d'Excellence</p>
-              </div>
+              <p className="text-xl font-light mb-2">Bienvenue dans votre système de gestion hospitalière</p>
+              <p className="text-blue-100">Développé par BRAIN en Côte d'Ivoire</p>
             </div>
-            <p className="text-xl font-light mb-2">Bienvenue dans votre système de gestion hospitalière</p>
-            <p className="text-blue-100">Développé par BRAIN en Côte d'Ivoire</p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
-            <div className="text-center">
-              <p className="text-3xl font-bold">{formattedTime}</p>
-              <p className="text-sm capitalize">{formattedDate}</p>
-            </div>
-            <div className="mt-3 space-y-1 text-sm">
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-blue-200" />
-                <span>Cocody - Vallon, Abidjan</span>
+            
+            <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
+              <div className="text-center">
+                <p className="text-3xl font-bold">{formattedTime}</p>
+                <p className="text-sm capitalize">{formattedDate}</p>
               </div>
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-blue-200" />
-                <span>Ouvert 24/7</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-blue-200" />
-                <span>+225 07 59 27 88 22</span>
+              <div className="mt-3 space-y-1 text-sm">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-blue-200" />
+                  <span>Cocody - Vallon, Abidjan</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-blue-200" />
+                  <span>Ouvert 24/7</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Phone className="h-4 w-4 text-blue-200" />
+                  <span>+225 07 59 27 88 22</span>
+                </div>
               </div>
             </div>
           </div>

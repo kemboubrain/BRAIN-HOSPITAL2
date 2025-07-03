@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { Patient, Doctor, Appointment, Consultation, Medication, Invoice, LabResult, User, DashboardStats, CareService, PatientCareRecord, Hospitalization, Room, LabTest, InsuranceProvider, InsurancePolicy, PatientInsurance, InsuranceClaim, StockMovement } from '../types';
+import { Patient, Doctor, Appointment, Consultation, Medication, Invoice, LabResult, User, DashboardStats, CareService, PatientCareRecord, Hospitalization, Room, LabTest, InsuranceProvider, InsurancePolicy, PatientInsurance, InsuranceClaim, StockMovement, Role, AccessLog } from '../types';
 import { 
   patientService, 
   doctorService, 
@@ -28,6 +28,9 @@ interface AppState {
   insurancePolicies: InsurancePolicy[];
   patientInsurances: PatientInsurance[];
   insuranceClaims: InsuranceClaim[];
+  roles: Role[];
+  users: User[];
+  accessLogs: AccessLog[];
   currentUser: User | null;
   dashboardStats: DashboardStats;
   isLoading: boolean;
@@ -88,6 +91,13 @@ type AppAction =
   | { type: 'ADD_INSURANCE_CLAIM'; payload: InsuranceClaim }
   | { type: 'UPDATE_INSURANCE_CLAIM'; payload: InsuranceClaim }
   | { type: 'DELETE_INSURANCE_CLAIM'; payload: string }
+  | { type: 'ADD_ROLE'; payload: Role }
+  | { type: 'UPDATE_ROLE'; payload: Role }
+  | { type: 'DELETE_ROLE'; payload: string }
+  | { type: 'ADD_USER'; payload: User }
+  | { type: 'UPDATE_USER'; payload: User }
+  | { type: 'DELETE_USER'; payload: string }
+  | { type: 'ADD_ACCESS_LOG'; payload: AccessLog }
   | { type: 'UPDATE_DASHBOARD_STATS'; payload: DashboardStats };
 
 const initialState: AppState = {
@@ -108,6 +118,9 @@ const initialState: AppState = {
   insurancePolicies: [],
   patientInsurances: [],
   insuranceClaims: [],
+  roles: [],
+  users: [],
+  accessLogs: [],
   currentUser: null,
   dashboardStats: {
     todayPatients: 0,
@@ -326,6 +339,32 @@ function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         insuranceClaims: state.insuranceClaims.filter(ic => ic.id !== action.payload)
       };
+    case 'ADD_ROLE':
+      return { ...state, roles: [...state.roles, action.payload] };
+    case 'UPDATE_ROLE':
+      return {
+        ...state,
+        roles: state.roles.map(r => r.id === action.payload.id ? action.payload : r)
+      };
+    case 'DELETE_ROLE':
+      return {
+        ...state,
+        roles: state.roles.filter(r => r.id !== action.payload)
+      };
+    case 'ADD_USER':
+      return { ...state, users: [...state.users, action.payload] };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        users: state.users.map(u => u.id === action.payload.id ? action.payload : u)
+      };
+    case 'DELETE_USER':
+      return {
+        ...state,
+        users: state.users.filter(u => u.id !== action.payload)
+      };
+    case 'ADD_ACCESS_LOG':
+      return { ...state, accessLogs: [...state.accessLogs, action.payload] };
     case 'UPDATE_DASHBOARD_STATS':
       return { ...state, dashboardStats: action.payload };
     default:
@@ -963,6 +1002,270 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         ];
 
+        // Données simulées pour les rôles et permissions
+        const roles: Role[] = [
+          {
+            id: 'role-1',
+            name: 'admin',
+            description: 'Administrateur avec accès complet',
+            permissions: modules.map(module => ({
+              id: `perm-admin-${module}`,
+              module,
+              canView: true,
+              canCreate: true,
+              canEdit: true,
+              canDelete: true
+            })),
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'role-2',
+            name: 'manager',
+            description: 'Gérant avec accès à la gestion',
+            permissions: modules.map(module => ({
+              id: `perm-manager-${module}`,
+              module,
+              canView: true,
+              canCreate: true,
+              canEdit: true,
+              canDelete: module !== 'accessManagement'
+            })),
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'role-3',
+            name: 'doctor',
+            description: 'Médecin avec accès aux dossiers médicaux',
+            permissions: [
+              { id: 'perm-doctor-dashboard', module: 'dashboard', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-patients', module: 'patients', canView: true, canCreate: false, canEdit: true, canDelete: false },
+              { id: 'perm-doctor-doctors', module: 'doctors', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-appointments', module: 'appointments', canView: true, canCreate: true, canEdit: true, canDelete: true },
+              { id: 'perm-doctor-consultations', module: 'consultations', canView: true, canCreate: true, canEdit: true, canDelete: true },
+              { id: 'perm-doctor-care', module: 'care', canView: true, canCreate: true, canEdit: true, canDelete: false },
+              { id: 'perm-doctor-hospitalization', module: 'hospitalization', canView: true, canCreate: true, canEdit: true, canDelete: false },
+              { id: 'perm-doctor-pharmacy', module: 'pharmacy', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-billing', module: 'billing', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-laboratory', module: 'laboratory', canView: true, canCreate: true, canEdit: true, canDelete: false },
+              { id: 'perm-doctor-reports', module: 'reports', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-insurance', module: 'insurance', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-doctor-accessManagement', module: 'accessManagement', canView: false, canCreate: false, canEdit: false, canDelete: false }
+            ],
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'role-4',
+            name: 'receptionist',
+            description: 'Assistant d\'accueil pour la gestion des patients et rendez-vous',
+            permissions: [
+              { id: 'perm-receptionist-dashboard', module: 'dashboard', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-patients', module: 'patients', canView: true, canCreate: true, canEdit: true, canDelete: false },
+              { id: 'perm-receptionist-doctors', module: 'doctors', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-appointments', module: 'appointments', canView: true, canCreate: true, canEdit: true, canDelete: true },
+              { id: 'perm-receptionist-consultations', module: 'consultations', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-care', module: 'care', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-hospitalization', module: 'hospitalization', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-pharmacy', module: 'pharmacy', canView: false, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-billing', module: 'billing', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-laboratory', module: 'laboratory', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-reports', module: 'reports', canView: false, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-insurance', module: 'insurance', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-receptionist-accessManagement', module: 'accessManagement', canView: false, canCreate: false, canEdit: false, canDelete: false }
+            ],
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'role-5',
+            name: 'accountant',
+            description: 'Comptable pour la gestion financière',
+            permissions: [
+              { id: 'perm-accountant-dashboard', module: 'dashboard', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-patients', module: 'patients', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-doctors', module: 'doctors', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-appointments', module: 'appointments', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-consultations', module: 'consultations', canView: false, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-care', module: 'care', canView: false, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-hospitalization', module: 'hospitalization', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-pharmacy', module: 'pharmacy', canView: true, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-billing', module: 'billing', canView: true, canCreate: true, canEdit: true, canDelete: true },
+              { id: 'perm-accountant-laboratory', module: 'laboratory', canView: false, canCreate: false, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-reports', module: 'reports', canView: true, canCreate: true, canEdit: false, canDelete: false },
+              { id: 'perm-accountant-insurance', module: 'insurance', canView: true, canCreate: true, canEdit: true, canDelete: false },
+              { id: 'perm-accountant-accessManagement', module: 'accessManagement', canView: false, canCreate: false, canEdit: false, canDelete: false }
+            ],
+            createdAt: new Date().toISOString()
+          }
+        ];
+
+        // Données simulées pour les utilisateurs
+        const users: User[] = [
+          {
+            id: 'user-1',
+            username: 'admin',
+            email: 'admin@medicenter.sn',
+            role: 'admin',
+            firstName: 'Administrateur',
+            lastName: 'Système',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'user-2',
+            username: 'manager',
+            email: 'manager@medicenter.sn',
+            role: 'manager',
+            firstName: 'Directeur',
+            lastName: 'Médical',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'user-3',
+            username: 'doctor1',
+            email: 'a.diagne@clinique.sn',
+            role: 'doctor',
+            firstName: 'Abdoulaye',
+            lastName: 'Diagne',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'user-4',
+            username: 'doctor2',
+            email: 'f.mbaye@clinique.sn',
+            role: 'doctor',
+            firstName: 'Fatima',
+            lastName: 'Mbaye',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'user-5',
+            username: 'reception1',
+            email: 'reception@medicenter.sn',
+            role: 'receptionist',
+            firstName: 'Aminata',
+            lastName: 'Sow',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'user-6',
+            username: 'compta1',
+            email: 'comptabilite@medicenter.sn',
+            role: 'accountant',
+            firstName: 'Moussa',
+            lastName: 'Diop',
+            isActive: true,
+            createdAt: new Date().toISOString()
+          }
+        ];
+
+        // Données simulées pour les logs d'accès
+        const accessLogs: AccessLog[] = [
+          {
+            id: 'log-1',
+            userId: 'user-1',
+            action: 'create',
+            targetType: 'role',
+            targetId: 'role-3',
+            details: 'Création du rôle "doctor" avec permissions pour les modules médicaux',
+            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours avant
+          },
+          {
+            id: 'log-2',
+            userId: 'user-1',
+            action: 'create',
+            targetType: 'role',
+            targetId: 'role-4',
+            details: 'Création du rôle "receptionist" avec permissions pour l\'accueil',
+            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours avant
+          },
+          {
+            id: 'log-3',
+            userId: 'user-1',
+            action: 'create',
+            targetType: 'role',
+            targetId: 'role-5',
+            details: 'Création du rôle "accountant" avec permissions pour la comptabilité',
+            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours avant
+          },
+          {
+            id: 'log-4',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'user',
+            targetId: 'user-3',
+            details: 'Attribution du rôle "doctor" à l\'utilisateur Abdoulaye Diagne',
+            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 jours avant
+          },
+          {
+            id: 'log-5',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'user',
+            targetId: 'user-4',
+            details: 'Attribution du rôle "doctor" à l\'utilisateur Fatima Mbaye',
+            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() // 5 jours avant
+          },
+          {
+            id: 'log-6',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'user',
+            targetId: 'user-5',
+            details: 'Attribution du rôle "receptionist" à l\'utilisateur Aminata Sow',
+            timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 jours avant
+          },
+          {
+            id: 'log-7',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'user',
+            targetId: 'user-6',
+            details: 'Attribution du rôle "accountant" à l\'utilisateur Moussa Diop',
+            timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 jours avant
+          },
+          {
+            id: 'log-8',
+            userId: 'user-2',
+            action: 'update',
+            targetType: 'role',
+            targetId: 'role-3',
+            details: 'Modification des permissions du rôle "doctor": ajout de l\'accès en écriture pour les consultations',
+            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString() // 2 jours avant
+          },
+          {
+            id: 'log-9',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'role',
+            targetId: 'role-4',
+            details: 'Modification des permissions du rôle "receptionist": ajout de l\'accès en lecture pour les consultations',
+            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() // 1 jour avant
+          },
+          {
+            id: 'log-10',
+            userId: 'user-1',
+            action: 'update',
+            targetType: 'role',
+            targetId: 'role-5',
+            details: 'Modification des permissions du rôle "accountant": ajout de l\'accès en écriture pour les factures',
+            timestamp: new Date().toISOString() // aujourd'hui
+          }
+        ];
+
+        // Définir l'utilisateur actuel (pour la démo)
+        const currentUser: User = {
+          id: 'user-1',
+          username: 'admin',
+          email: 'admin@medicenter.sn',
+          role: 'admin',
+          firstName: 'Administrateur',
+          lastName: 'Système',
+          isActive: true
+        };
+
         // Calculer les statistiques du dashboard
         const today = new Date().toISOString().split('T')[0];
         const todayAppointments = appointments.filter(a => a.date === today).length;
@@ -1004,6 +1307,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
             insurancePolicies,
             patientInsurances,
             insuranceClaims,
+            roles,
+            users,
+            accessLogs,
+            currentUser,
             dashboardStats
           }
         });
@@ -1048,3 +1355,20 @@ export function useApp() {
   }
   return context;
 }
+
+// Liste des modules pour les permissions
+const modules = [
+  'dashboard',
+  'patients',
+  'doctors',
+  'appointments',
+  'consultations',
+  'care',
+  'hospitalization',
+  'pharmacy',
+  'billing',
+  'laboratory',
+  'reports',
+  'insurance',
+  'accessManagement'
+];

@@ -193,10 +193,12 @@ export interface User {
   id: string;
   username: string;
   email: string;
-  role: 'admin' | 'doctor' | 'nurse' | 'receptionist' | 'pharmacist';
+  role: 'admin' | 'doctor' | 'nurse' | 'receptionist' | 'pharmacist' | 'manager' | 'accountant';
   firstName: string;
   lastName: string;
   isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface DashboardStats {
@@ -399,4 +401,48 @@ export interface InsuranceClaim {
   notes?: string;
   createdAt: string;
   updatedAt?: string;
+}
+
+// Nouvelles interfaces pour la gestion des accès
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  permissions: Permission[];
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Permission {
+  id: string;
+  module: Module;
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export type Module = 
+  | 'dashboard' 
+  | 'patients' 
+  | 'doctors' 
+  | 'appointments' 
+  | 'consultations' 
+  | 'care' 
+  | 'hospitalization' 
+  | 'pharmacy' 
+  | 'billing' 
+  | 'laboratory' 
+  | 'reports' 
+  | 'insurance'
+  | 'accessManagement';
+
+export interface AccessLog {
+  id: string;
+  userId: string;
+  action: 'create' | 'update' | 'delete';
+  targetType: 'role' | 'permission' | 'user';
+  targetId: string;
+  details: string;
+  timestamp: string;
 }

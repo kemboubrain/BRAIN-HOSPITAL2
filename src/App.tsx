@@ -17,6 +17,7 @@ import Billing from './pages/Billing';
 import Laboratory from './pages/Laboratory';
 import Reports from './pages/Reports';
 import Insurance from './pages/Insurance';
+import AccessManagement from './pages/AccessManagement';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -52,6 +53,7 @@ function AppContent() {
             <Route path="/laboratory" element={<Laboratory />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/insurance" element={<Insurance />} />
+            <Route path="/access-management" element={<AccessManagement />} />
           </Routes>
         </Layout>
       </Router>

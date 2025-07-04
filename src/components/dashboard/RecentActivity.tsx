@@ -63,19 +63,19 @@ const RecentActivity: React.FC = () => {
         {activities.map((activity) => {
           const Icon = activity.icon;
           return (
-            <div key={activity.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-              <div className={`${activity.color} rounded-lg p-2 flex-shrink-0`}>
-                <Icon className="h-4 w-4" />
+            <div key={activity.id} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 hover:-translate-x-1 group">
+              <div className={`${activity.color} rounded-lg p-2 flex-shrink-0 transition-all duration-300 group-hover:scale-110`}>
+                <Icon className="h-4 w-4 transition-all duration-500 group-hover:rotate-12" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white mb-1 transition-all duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">
                   {activity.title}
                 </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1 transition-all duration-300 group-hover:text-gray-900 dark:group-hover:text-gray-300">
                   {activity.description}
                 </p>
-                <div className="flex items-center text-xs text-gray-500 dark:text-gray-500">
-                  <Clock className="h-3 w-3 mr-1" />
+                <div className="flex items-center text-xs text-gray-500 dark:text-gray-500 transition-all duration-300">
+                  <Clock className="h-3 w-3 mr-1 transition-all duration-300 group-hover:text-primary-500" />
                   {activity.time}
                 </div>
               </div>

@@ -72,11 +72,11 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
-          <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between">
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-1 group">
+            <div className="flex items-center justify-between group">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{stat.value}</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1 transition-all duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mb-2 transition-all duration-300 group-hover:scale-105 origin-left">{stat.value}</p>
                 <div className="flex items-center">
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                     stat.trend.includes('+') ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
@@ -87,8 +87,8 @@ const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
                   </span>
                 </div>
               </div>
-              <div className={`${stat.color} rounded-lg p-3 text-white`}>
-                <Icon className="h-6 w-6" />
+              <div className={`${stat.color} rounded-lg p-3 text-white transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg`}>
+                <Icon className="h-6 w-6 transition-all duration-500 group-hover:rotate-12" />
               </div>
             </div>
           </div>

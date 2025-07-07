@@ -158,21 +158,6 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['lab_results']['Row'], 'id'>;
         Update: Partial<Database['public']['Tables']['lab_results']['Insert']>;
       };
-      rendezvous_pending: {
-        Row: {
-          id: string;
-          nom_patient: string;
-          email: string;
-          telephone: string;
-          medecin_id: string;
-          date_heure: string;
-          statut: string;
-          token: string;
-          created_at: string;
-        };
-        Insert: Omit<Database['public']['Tables']['rendezvous_pending']['Row'], 'id' | 'token' | 'created_at'>;
-        Update: Partial<Database['public']['Tables']['rendezvous_pending']['Insert']>;
-      };
     };
   };
 }

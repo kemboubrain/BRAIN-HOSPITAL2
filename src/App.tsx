@@ -18,6 +18,8 @@ import Laboratory from './pages/Laboratory';
 import Reports from './pages/Reports';
 import Insurance from './pages/Insurance';
 import AccessManagement from './pages/AccessManagement';
+import PublicAppointment from './pages/PublicAppointment';
+import ValidateAppointment from './pages/ValidateAppointment';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -26,25 +28,30 @@ function AppContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <LoginForm />;
-  }
-
-  return (
-    <AppProvider>
-      <Router>
-        <Layout>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/patients" element={<Patients />} />
-            <Route path="/patients/:id" element={<PatientProfile />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/staff" element={<Staff />} />
+            {/* Route publique pour la prise de rendez-vous */}
+            <Route path="/prendre-rendez-vous" element={<PublicAppointment />} />
+            
+            {/* Routes protégées nécessitant une authentification */}
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="patients" element={<Patients />} />
+              <Route path="patients/:id" element={<PatientProfile />} />
+              <Route path="appointments" element={<Appointments />} />
+              <Route path="staff" element={<Staff />} />
+              <Route path="consultations" element={<Consultations />} />
+              <Route path="care" element={<Care />} />
+              <Route path="hospitalization" element={<Hospitalization />} />
+              <Route path="pharmacy" element={<Pharmacy />} />
+              <Route path="billing" element={<Billing />} />
+              <Route path="laboratory" element={<Laboratory />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="insurance" element={<Insurance />} />
+              <Route path="access-management" element={<AccessManagement />} />
+              <Route path="validate-appointment/:token" element={<ValidateAppointment />} />
+            </Route>
+          </Routes>
             <Route path="/consultations" element={<Consultations />} />
             <Route path="/care" element={<Care />} />
             <Route path="/hospitalization" element={<Hospitalization />} />

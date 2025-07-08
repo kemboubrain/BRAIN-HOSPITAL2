@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Activity, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -130,6 +131,11 @@ const LoginForm: React.FC = () => {
 
           {/* Informations supplémentaires */}
           <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              <Link to="/" className="text-primary-600 dark:text-primary-400 hover:underline">
+                Retour à l'accueil
+              </Link>
+            </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Système de gestion de centre de santé
             </p>

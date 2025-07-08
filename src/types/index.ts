@@ -403,6 +403,19 @@ export interface InsuranceClaim {
   updatedAt?: string;
 }
 
+// Interface pour les rendez-vous en attente
+export interface RendezvousPending {
+  id: string;
+  nomPatient: string;
+  email: string;
+  telephone?: string;
+  medecinId: string;
+  dateHeure: string;
+  statut: 'pending' | 'approved' | 'rejected';
+  token: string;
+  createdAt: string;
+}
+
 // Nouvelles interfaces pour la gestion des accès
 export interface Role {
   id: string;

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
+import { consultationService } from '../../services/supabaseService';
 import { Consultation, Prescription } from '../../types';
 
 interface ConsultationModalProps {

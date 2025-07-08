@@ -1,892 +1,389 @@
 import { supabase } from '../lib/supabase';
-import type { 
-  Patient, 
-  Doctor, 
-  Appointment, 
-  Consultation, 
-  Medication, 
-  Prescription,
-  Invoice,
-  InvoiceItem,
-  LabResult,
-  CareService,
-  PatientCareRecord,
-  CareItem,
-  Room,
-  Hospitalization,
-  HospitalizationService
-} from '../types';
+import { Patient, Doctor, Appointment, Consultation, Medication, Invoice, LabResult } from '../types';
 
-// Patient Service
+// Service pour les patients
 export const patientService = {
-  async getAll() {
+  async getAll(): Promise<Patient[]> {
     const { data, error } = await supabase
       .from('patients')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('patients')
-      .select('*')
-      .eq('id', id)
-      .single();
     
-    if (error) throw error;
-    return data;
+    return data.map(patient => ({
+      id: patient.id,
+      firstName: patient.first_name,
+      lastName: patient.last_name,
+      dateOfBirth: patient.date_of_birth,
+      gender: patient.gender,
+      phone: patient.phone,
+      email: patient.email,
+      address: patient.address,
+      city: patient.city,
+      postalCode: patient.postal_code,
+      bloodGroup: patient.blood_group,
+      allergies: patient.allergies,
+      emergencyContact: {
+        name: patient.emergency_contact_name,
+        phone: patient.emergency_contact_phone,
+        relationship: patient.emergency_contact_relationship
+      },
+      insurance: {
+        provider: patient.insurance_provider,
+        number: patient.insurance_number
+      },
+      createdAt: patient.created_at,
+      updatedAt: patient.updated_at
+    }));
   },
 
-  async create(patient: Omit<Patient, 'id' | 'created_at' | 'updated_at'>) {
+  async create(patient: Omit<Patient, 'id' | 'createdAt' | 'updatedAt'>): Promise<Patient> {
     const { data, error } = await supabase
       .from('patients')
-      .insert(patient)
+      .insert({
+        first_name: patient.firstName,
+        last_name: patient.lastName,
+        date_of_birth: patient.dateOfBirth,
+        gender: patient.gender,
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address,
+        city: patient.city,
+        postal_code: patient.postalCode,
+        blood_group: patient.bloodGroup,
+        allergies: patient.allergies,
+        emergency_contact_name: patient.emergencyContact.name,
+        emergency_contact_phone: patient.emergencyContact.phone,
+        emergency_contact_relationship: patient.emergencyContact.relationship,
+        insurance_provider: patient.insurance.provider,
+        insurance_number: patient.insurance.number
+      })
       .select()
       .single();
-    
+
     if (error) throw error;
-    return data;
+    
+    return {
+      id: data.id,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      dateOfBirth: data.date_of_birth,
+      gender: data.gender,
+      phone: data.phone,
+      email: data.email,
+      address: data.address,
+      city: data.city,
+      postalCode: data.postal_code,
+      bloodGroup: data.blood_group,
+      allergies: data.allergies,
+      emergencyContact: {
+        name: data.emergency_contact_name,
+        phone: data.emergency_contact_phone,
+        relationship: data.emergency_contact_relationship
+      },
+      insurance: {
+        provider: data.insurance_provider,
+        number: data.insurance_number
+      },
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
   },
 
-  async update(id: string, patient: Partial<Patient>) {
+  async update(id: string, patient: Partial<Patient>): Promise<Patient> {
+    const updateData: any = {};
+    
+    if (patient.firstName) updateData.first_name = patient.firstName;
+    if (patient.lastName) updateData.last_name = patient.lastName;
+    if (patient.dateOfBirth) updateData.date_of_birth = patient.dateOfBirth;
+    if (patient.gender) updateData.gender = patient.gender;
+    if (patient.phone) updateData.phone = patient.phone;
+    if (patient.email) updateData.email = patient.email;
+    if (patient.address) updateData.address = patient.address;
+    if (patient.city) updateData.city = patient.city;
+    if (patient.postalCode) updateData.postal_code = patient.postalCode;
+    if (patient.bloodGroup) updateData.blood_group = patient.bloodGroup;
+    if (patient.allergies) updateData.allergies = patient.allergies;
+    if (patient.emergencyContact) {
+      updateData.emergency_contact_name = patient.emergencyContact.name;
+      updateData.emergency_contact_phone = patient.emergencyContact.phone;
+      updateData.emergency_contact_relationship = patient.emergencyContact.relationship;
+    }
+    if (patient.insurance) {
+      updateData.insurance_provider = patient.insurance.provider;
+      updateData.insurance_number = patient.insurance.number;
+    }
+
     const { data, error } = await supabase
       .from('patients')
-      .update(patient)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
-    
+
     if (error) throw error;
-    return data;
+    
+    return {
+      id: data.id,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      dateOfBirth: data.date_of_birth,
+      gender: data.gender,
+      phone: data.phone,
+      email: data.email,
+      address: data.address,
+      city: data.city,
+      postalCode: data.postal_code,
+      bloodGroup: data.blood_group,
+      allergies: data.allergies,
+      emergencyContact: {
+        name: data.emergency_contact_name,
+        phone: data.emergency_contact_phone,
+        relationship: data.emergency_contact_relationship
+      },
+      insurance: {
+        provider: data.insurance_provider,
+        number: data.insurance_number
+      },
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
   },
 
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     const { error } = await supabase
       .from('patients')
       .delete()
       .eq('id', id);
-    
+
     if (error) throw error;
   }
 };
 
-// Doctor Service
+// Service pour les médecins
 export const doctorService = {
-  async getAll() {
+  async getAll(): Promise<Doctor[]> {
     const { data, error } = await supabase
       .from('doctors')
       .select('*')
       .order('created_at', { ascending: false });
     
     if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('doctors')
-      .select('*')
-      .eq('id', id)
-      .single();
     
-    if (error) throw error;
-    return data;
-  },
-
-  async create(doctor: Omit<Doctor, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
-      .from('doctors')
-      .insert(doctor)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, doctor: Partial<Doctor>) {
-    const { data, error } = await supabase
-      .from('doctors')
-      .update(doctor)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('doctors')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    return data.map(doctor => ({
+      id: doctor.id,
+      firstName: doctor.first_name,
+      lastName: doctor.last_name,
+      specialty: doctor.specialty,
+      phone: doctor.phone,
+      email: doctor.email,
+      schedule: doctor.schedule,
+      consultationFee: doctor.consultation_fee,
+      createdAt: doctor.created_at
+    }));
   }
 };
 
-// Appointment Service
+// Service pour les rendez-vous
 export const appointmentService = {
-  async getAll() {
+  async getAll(): Promise<Appointment[]> {
     const { data, error } = await supabase
       .from('appointments')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*)
-      `)
+      .select('*')
       .order('date', { ascending: true });
     
     if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*)
-      `)
-      .eq('id', id)
-      .single();
     
-    if (error) throw error;
-    return data;
+    return data.map(appointment => ({
+      id: appointment.id,
+      patientId: appointment.patient_id,
+      doctorId: appointment.doctor_id,
+      date: appointment.date,
+      time: appointment.time,
+      duration: appointment.duration,
+      type: appointment.type as any,
+      status: appointment.status as any,
+      reason: appointment.reason,
+      notes: appointment.notes,
+      createdAt: appointment.created_at
+    }));
   },
 
-  async create(appointment: Omit<Appointment, 'id' | 'created_at'>) {
+  async create(appointment: Omit<Appointment, 'id' | 'createdAt'>): Promise<Appointment> {
     const { data, error } = await supabase
       .from('appointments')
-      .insert(appointment)
+      .insert({
+        patient_id: appointment.patientId,
+        doctor_id: appointment.doctorId,
+        date: appointment.date,
+        time: appointment.time,
+        duration: appointment.duration,
+        type: appointment.type,
+        status: appointment.status,
+        reason: appointment.reason,
+        notes: appointment.notes || ''
+      })
       .select()
       .single();
-    
-    if (error) throw error;
-    return data;
-  },
 
-  async update(id: string, appointment: Partial<Appointment>) {
-    const { data, error } = await supabase
-      .from('appointments')
-      .update(appointment)
-      .eq('id', id)
-      .select()
-      .single();
-    
     if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('appointments')
-      .delete()
-      .eq('id', id);
     
-    if (error) throw error;
+    return {
+      id: data.id,
+      patientId: data.patient_id,
+      doctorId: data.doctor_id,
+      date: data.date,
+      time: data.time,
+      duration: data.duration,
+      type: data.type,
+      status: data.status,
+      reason: data.reason,
+      notes: data.notes,
+      createdAt: data.created_at
+    };
   }
 };
 
-// Consultation Service
-export const consultationService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('consultations')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*),
-        appointment:appointments(*)
-      `)
-      .order('date', { ascending: false });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('consultations')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*),
-        appointment:appointments(*)
-      `)
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(consultation: Omit<Consultation, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
-      .from('consultations')
-      .insert(consultation)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, consultation: Partial<Consultation>) {
-    const { data, error } = await supabase
-      .from('consultations')
-      .update(consultation)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('consultations')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Medication Service
+// Service pour les médicaments
 export const medicationService = {
-  async getAll() {
+  async getAll(): Promise<Medication[]> {
     const { data, error } = await supabase
       .from('medications')
       .select('*')
       .order('name', { ascending: true });
     
     if (error) throw error;
-    return data;
-  },
+    
+    return data.map(medication => ({
+      id: medication.id,
+      name: medication.name,
+      category: medication.category,
+      manufacturer: medication.manufacturer,
+      batchNumber: medication.batch_number,
+      expiryDate: medication.expiry_date,
+      stock: medication.stock,
+      unitPrice: medication.unit_price,
+      minStock: medication.min_stock,
+      description: medication.description
+    }));
+  }
+};
 
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('medications')
+// Service pour les consultations
+export const consultationService = {
+  async getAll(): Promise<Consultation[]> {
+    const { data: consultationsData, error: consultationsError } = await supabase
+      .from('consultations')
       .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(medication: Omit<Medication, 'id'>) {
-    const { data, error } = await supabase
-      .from('medications')
-      .insert(medication)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, medication: Partial<Medication>) {
-    const { data, error } = await supabase
-      .from('medications')
-      .update(medication)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('medications')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Prescription Service
-export const prescriptionService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .select(`
-        *,
-        consultation:consultations(*),
-        medication:medications(*)
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getByConsultationId(consultationId: string) {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .select(`
-        *,
-        medication:medications(*)
-      `)
-      .eq('consultation_id', consultationId);
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(prescription: Omit<Prescription, 'id'>) {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .insert(prescription)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, prescription: Partial<Prescription>) {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .update(prescription)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('prescriptions')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Invoice Service
-export const invoiceService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('invoices')
-      .select(`
-        *,
-        patient:patients(*),
-        consultation:consultations(*)
-      `)
       .order('date', { ascending: false });
     
-    if (error) throw error;
-    return data;
-  },
+    if (consultationsError) throw consultationsError;
 
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('invoices')
-      .select(`
-        *,
-        patient:patients(*),
-        consultation:consultations(*),
-        items:invoice_items(*)
-      `)
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
+    // Récupérer les prescriptions pour chaque consultation
+    const consultations = await Promise.all(
+      consultationsData.map(async (consultation) => {
+        const { data: prescriptionsData, error: prescriptionsError } = await supabase
+          .from('prescriptions')
+          .select('*')
+          .eq('consultation_id', consultation.id);
 
-  async create(invoice: Omit<Invoice, 'id'>) {
-    const { data, error } = await supabase
-      .from('invoices')
-      .insert(invoice)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
+        if (prescriptionsError) throw prescriptionsError;
 
-  async update(id: string, invoice: Partial<Invoice>) {
-    const { data, error } = await supabase
-      .from('invoices')
-      .update(invoice)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
+        return {
+          id: consultation.id,
+          appointmentId: consultation.appointment_id,
+          patientId: consultation.patient_id,
+          doctorId: consultation.doctor_id,
+          date: consultation.date,
+          symptoms: consultation.symptoms,
+          diagnosis: consultation.diagnosis,
+          treatment: consultation.treatment,
+          prescription: prescriptionsData.map(p => ({
+            id: p.id,
+            consultationId: p.consultation_id,
+            medicationId: p.medication_id,
+            dosage: p.dosage,
+            frequency: p.frequency,
+            duration: p.duration,
+            instructions: p.instructions
+          })),
+          notes: consultation.notes,
+          followUpDate: consultation.follow_up_date,
+          createdAt: consultation.created_at
+        };
+      })
+    );
 
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('invoices')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    return consultations;
   }
 };
 
-// Invoice Item Service
-export const invoiceItemService = {
-  async getByInvoiceId(invoiceId: string) {
-    const { data, error } = await supabase
-      .from('invoice_items')
+// Service pour les factures
+export const invoiceService = {
+  async getAll(): Promise<Invoice[]> {
+    const { data: invoicesData, error: invoicesError } = await supabase
+      .from('invoices')
       .select('*')
-      .eq('invoice_id', invoiceId);
+      .order('date', { ascending: false });
     
-    if (error) throw error;
-    return data;
-  },
+    if (invoicesError) throw invoicesError;
 
-  async create(item: Omit<InvoiceItem, 'id'>) {
-    const { data, error } = await supabase
-      .from('invoice_items')
-      .insert(item)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
+    // Récupérer les éléments pour chaque facture
+    const invoices = await Promise.all(
+      invoicesData.map(async (invoice) => {
+        const { data: itemsData, error: itemsError } = await supabase
+          .from('invoice_items')
+          .select('*')
+          .eq('invoice_id', invoice.id);
 
-  async update(id: string, item: Partial<InvoiceItem>) {
-    const { data, error } = await supabase
-      .from('invoice_items')
-      .update(item)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
+        if (itemsError) throw itemsError;
 
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('invoice_items')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+        return {
+          id: invoice.id,
+          patientId: invoice.patient_id,
+          consultationId: invoice.consultation_id,
+          date: invoice.date,
+          items: itemsData.map(item => ({
+            id: item.id,
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unit_price,
+            total: item.total
+          })),
+          subtotal: invoice.subtotal,
+          tax: invoice.tax,
+          total: invoice.total,
+          status: invoice.status as any,
+          paymentMethod: invoice.payment_method,
+          paymentDate: invoice.payment_date
+        };
+      })
+    );
+
+    return invoices;
   }
 };
 
-// Lab Result Service
+// Service pour les résultats de laboratoire
 export const labResultService = {
-  async getAll() {
+  async getAll(): Promise<LabResult[]> {
     const { data, error } = await supabase
       .from('lab_results')
-      .select(`
-        *,
-        patient:patients(*),
-        consultation:consultations(*)
-      `)
+      .select('*')
       .order('test_date', { ascending: false });
     
     if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('lab_results')
-      .select(`
-        *,
-        patient:patients(*),
-        consultation:consultations(*)
-      `)
-      .eq('id', id)
-      .single();
     
-    if (error) throw error;
-    return data;
-  },
-
-  async create(labResult: Omit<LabResult, 'id'>) {
-    const { data, error } = await supabase
-      .from('lab_results')
-      .insert(labResult)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, labResult: Partial<LabResult>) {
-    const { data, error } = await supabase
-      .from('lab_results')
-      .update(labResult)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('lab_results')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Care Service
-export const careService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('care_services')
-      .select('*')
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('care_services')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(careService: Omit<CareService, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
-      .from('care_services')
-      .insert(careService)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, careService: Partial<CareService>) {
-    const { data, error } = await supabase
-      .from('care_services')
-      .update(careService)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('care_services')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Patient Care Record Service
-export const patientCareRecordService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('patient_care_records')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*)
-      `)
-      .order('care_date', { ascending: false });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('patient_care_records')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*),
-        care_items:care_items(*, care_service:care_services(*))
-      `)
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(record: Omit<PatientCareRecord, 'id' | 'created_at' | 'updated_at'>) {
-    const { data, error } = await supabase
-      .from('patient_care_records')
-      .insert(record)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, record: Partial<PatientCareRecord>) {
-    const { data, error } = await supabase
-      .from('patient_care_records')
-      .update(record)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('patient_care_records')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Care Item Service
-export const careItemService = {
-  async getByCareRecordId(careRecordId: string) {
-    const { data, error } = await supabase
-      .from('care_items')
-      .select(`
-        *,
-        care_service:care_services(*)
-      `)
-      .eq('care_record_id', careRecordId);
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(item: Omit<CareItem, 'id'>) {
-    const { data, error } = await supabase
-      .from('care_items')
-      .insert(item)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, item: Partial<CareItem>) {
-    const { data, error } = await supabase
-      .from('care_items')
-      .update(item)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('care_items')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Room Service
-export const roomService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('*')
-      .order('room_number', { ascending: true });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(room: Omit<Room, 'id' | 'created_at'>) {
-    const { data, error } = await supabase
-      .from('rooms')
-      .insert(room)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, room: Partial<Room>) {
-    const { data, error } = await supabase
-      .from('rooms')
-      .update(room)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('rooms')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Hospitalization Service
-export const hospitalizationService = {
-  async getAll() {
-    const { data, error } = await supabase
-      .from('hospitalizations')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*),
-        room:rooms(*)
-      `)
-      .order('admission_date', { ascending: false });
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async getById(id: string) {
-    const { data, error } = await supabase
-      .from('hospitalizations')
-      .select(`
-        *,
-        patient:patients(*),
-        doctor:doctors(*),
-        room:rooms(*),
-        services:hospitalization_services(*, care_service:care_services(*))
-      `)
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(hospitalization: Omit<Hospitalization, 'id' | 'created_at' | 'updated_at'>) {
-    const { data, error } = await supabase
-      .from('hospitalizations')
-      .insert(hospitalization)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, hospitalization: Partial<Hospitalization>) {
-    const { data, error } = await supabase
-      .from('hospitalizations')
-      .update(hospitalization)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('hospitalizations')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
-  }
-};
-
-// Hospitalization Service Items
-export const hospitalizationServiceService = {
-  async getByHospitalizationId(hospitalizationId: string) {
-    const { data, error } = await supabase
-      .from('hospitalization_services')
-      .select(`
-        *,
-        care_service:care_services(*)
-      `)
-      .eq('hospitalization_id', hospitalizationId);
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async create(service: Omit<HospitalizationService, 'id'>) {
-    const { data, error } = await supabase
-      .from('hospitalization_services')
-      .insert(service)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async update(id: string, service: Partial<HospitalizationService>) {
-    const { data, error } = await supabase
-      .from('hospitalization_services')
-      .update(service)
-      .eq('id', id)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  },
-
-  async delete(id: string) {
-    const { error } = await supabase
-      .from('hospitalization_services')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    return data.map(labResult => ({
+      id: labResult.id,
+      patientId: labResult.patient_id,
+      consultationId: labResult.consultation_id,
+      testType: labResult.test_type,
+      testDate: labResult.test_date,
+      results: labResult.results,
+      conclusion: labResult.conclusion,
+      technician: labResult.technician
+    }));
   }
 };

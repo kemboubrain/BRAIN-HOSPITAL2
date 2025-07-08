@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
 import LoginForm from './components/auth/LoginForm';
 import Layout from './components/layout/Layout';
-import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Patients from './pages/Patients';
 import PatientProfile from './pages/PatientProfile';
@@ -31,16 +30,13 @@ function AppContent() {
     );
   }
 
+  if (!user) {
+    return <LoginForm />;
+  }
+
   return (
-    <Router>
-      {!user ? (
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      ) : (
-        <AppProvider>
+    <AppProvider>
+      <Router>
         <Layout>
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -60,9 +56,8 @@ function AppContent() {
             <Route path="/access-management" element={<AccessManagement />} />
           </Routes>
         </Layout>
-        </AppProvider>
-      )}
-    </Router>
+      </Router>
+    </AppProvider>
   );
 }
 

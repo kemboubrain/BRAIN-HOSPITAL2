@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
-import { Calendar, Plus, Clock, User, Search, Filter } from 'lucide-react';
+import { Calendar, Plus, Clock, User, Search, Filter, Edit, Trash2 } from 'lucide-react';
 import AppointmentModal from '../components/appointments/AppointmentModal';
 import AppointmentCalendar from '../components/appointments/AppointmentCalendar';
 
 const Appointments: React.FC = () => {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const [showModal, setShowModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -63,6 +64,22 @@ const Appointments: React.FC = () => {
       default:
         return status;
     }
+  };
+
+  const handleEdit = (appointment: any) => {
+    setSelectedAppointment(appointment);
+    setShowModal(true);
+  };
+
+  const handleDelete = (appointmentId: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')) {
+      dispatch({ type: 'DELETE_APPOINTMENT', payload: appointmentId });
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedAppointment(null);
   };
 
   return (
@@ -162,6 +179,9 @@ const Appointments: React.FC = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Durée
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -218,6 +238,24 @@ const Appointments: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {appointment.duration} min
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleEdit(appointment)}
+                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            title="Modifier"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(appointment.id)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -236,7 +274,8 @@ const Appointments: React.FC = () => {
 
       {showModal && (
         <AppointmentModal
-          onClose={() => setShowModal(false)}
+          appointment={selectedAppointment}
+          onClose={handleCloseModal}
         />
       )}
     </div>

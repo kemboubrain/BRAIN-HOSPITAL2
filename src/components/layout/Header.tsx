@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bell, Settings, LogOut, User, Sun, Moon } from 'lucide-react';
+import { Bell, Settings, LogOut, User, Sun, Moon, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from '../common/SearchBar';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const Header: React.FC = () => {
   const { state, dispatch } = useApp();
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     const newTheme = state.theme === 'light' ? 'dark' : 'light';
@@ -16,6 +18,10 @@ const Header: React.FC = () => {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleBookAppointment = () => {
+    navigate('/book-appointment');
   };
 
   const notifications = [
@@ -71,7 +77,16 @@ const Header: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
+          {/* Book Appointment Button */}
+          <button
+            onClick={handleBookAppointment}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
+          >
+            <Calendar size={18} />
+            <span className="hidden sm:inline">Rendez-vous</span>
+          </button>
+
           {/* Toggle thème */}
           <button
             onClick={toggleTheme}

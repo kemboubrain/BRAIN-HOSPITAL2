@@ -52,6 +52,13 @@ const Patients: React.FC = () => {
             <User className="h-6 w-6 text-blue-600" />
           </div>
           <div className="flex-1 min-w-0">
+            {patient.patientCode && (
+              <div className="mb-2">
+                <span className="inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-mono px-2 py-1 rounded">
+                  {patient.patientCode}
+                </span>
+              </div>
+            )}
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
               {patient.firstName} {patient.lastName}
             </h3>
@@ -112,6 +119,13 @@ const Patients: React.FC = () => {
           </div>
           <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
+              {patient.patientCode && (
+                <div className="mb-1">
+                  <span className="inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-mono px-2 py-0.5 rounded">
+                    {patient.patientCode}
+                  </span>
+                </div>
+              )}
               <h3 className="font-semibold text-gray-900">{patient.firstName} {patient.lastName}</h3>
               <p className="text-sm text-gray-600">
                 {new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear()} ans • {patient.gender === 'M' ? 'Homme' : 'Femme'}
@@ -162,6 +176,13 @@ const Patients: React.FC = () => {
   const PatientMiniature = ({ patient }: { patient: any }) => (
     <div className="relative bg-white rounded-lg p-4 hover:shadow-md transition-all border border-gray-200 hover:border-blue-300 text-center group">
       <Link to={`/patients/${patient.id}`} className="block">
+        {patient.patientCode && (
+          <div className="mb-2">
+            <span className="inline-block bg-blue-50 border border-blue-200 text-blue-700 text-xs font-mono px-1 py-0.5 rounded">
+              {patient.patientCode}
+            </span>
+          </div>
+        )}
         <div className="bg-blue-100 rounded-full p-4 mx-auto mb-3 w-16 h-16 flex items-center justify-center">
           <User className="h-8 w-8 text-blue-600" />
         </div>

@@ -28,23 +28,33 @@ const PatientProfile: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Link
-          to="/patients"
-          className="text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <ArrowLeft className="h-6 w-6" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {patient.firstName} {patient.lastName}
-        </h1>
-        <button
-          onClick={() => setShowEditModal(true)}
-          className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
-        >
-          <Edit className="h-4 w-4" />
-          <span>Modifier</span>
-        </button>
+      <div className="flex flex-col space-y-3">
+        <div className="flex items-center space-x-4">
+          <Link
+            to="/patients"
+            className="text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <ArrowLeft className="h-6 w-6" />
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {patient.firstName} {patient.lastName}
+          </h1>
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="ml-auto bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 transition-colors"
+          >
+            <Edit className="h-4 w-4" />
+            <span>Modifier</span>
+          </button>
+        </div>
+        {patient.patientCode && (
+          <div className="flex items-center space-x-2">
+            <span className="bg-blue-50 border border-blue-300 text-blue-700 text-sm font-mono px-3 py-1 rounded-lg font-semibold">
+              {patient.patientCode}
+            </span>
+            <span className="text-sm text-gray-500">Code patient</span>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

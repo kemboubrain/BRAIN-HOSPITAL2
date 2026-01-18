@@ -24,6 +24,7 @@ export const patientService = {
       postalCode: patient.postal_code,
       bloodGroup: patient.blood_group,
       allergies: patient.allergies,
+      patientCode: patient.patient_code,
       emergencyContact: {
         name: patient.emergency_contact_name,
         phone: patient.emergency_contact_phone,
@@ -77,6 +78,7 @@ export const patientService = {
       postalCode: data.postal_code,
       bloodGroup: data.blood_group,
       allergies: data.allergies,
+      patientCode: data.patient_code,
       emergencyContact: {
         name: data.emergency_contact_name,
         phone: data.emergency_contact_phone,
@@ -137,6 +139,7 @@ export const patientService = {
       postalCode: data.postal_code,
       bloodGroup: data.blood_group,
       allergies: data.allergies,
+      patientCode: data.patient_code,
       emergencyContact: {
         name: data.emergency_contact_name,
         phone: data.emergency_contact_phone,

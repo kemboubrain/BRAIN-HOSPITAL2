@@ -204,6 +204,13 @@ const PatientModal: React.FC<PatientModalProps> = ({ patient, onClose }) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {patient?.patientCode && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Code Patient</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{patient.patientCode}</p>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
